@@ -489,7 +489,184 @@ psql -d имя_базы -f seed.sql
 
 ---
 
-## 13. Заключение
+## 13. Руководство по работе с базой данных
+
+### 13.1. Установка PostgreSQL
+
+Если PostgreSQL ещё не установлен, скачать можно с официального сайта: postgresql.org/download.  
+После установки убедитесь, что утилита `psql` доступна в терминале:
+
+```bash
+psql --version
+# Должно вывести: psql (PostgreSQL) 15.x
+```
+
+### 13.2. Создание базы данных
+
+Открываем терминал и создаём новую базу данных:
+
+```bash
+# Подключаемся к PostgreSQL от имени суперпользователя
+psql -U postgres
+
+# Внутри psql создаём базу
+CREATE DATABASE clinic_db;
+
+# Выходим
+\q
+```
+
+### 13.3. Развёртывание схемы и тестовых данных
+
+Выполняем файлы по порядку — сначала схема, потом данные:
+
+```bash
+# Создаём структуру таблиц
+psql -U postgres -d clinic_db -f schema.sql
+
+# Заполняем тестовыми данными
+psql -U postgres -d clinic_db -f seed.sql
+```
+
+Если всё прошло успешно, в консоли не будет сообщений об ошибках. Можно проверить:
+
+```bash
+psql -U postgres -d clinic_db -c "\dt"
+```
+
+Должны появиться все 7 таблиц: `appointments`, `doctors`, `lab_tests`, `medical_records`, `patients`, `payments`, `users`.
+
+### 13.4. Подключение к базе данных
+
+**Через терминал (psql):**
+
+```bash
+psql -U postgres -d clinic_db
+```
+
+Полезные команды внутри psql:
+
+```sql
+\dt              -- список всех таблиц
+\d patients      -- структура таблицы patients
+\dv              -- список представлений
+\q               -- выйти
+```
+
+**Через графический интерфейс (pgAdmin):**
+
+1. Открыть pgAdmin (устанавливается вместе с PostgreSQL).
+2. Servers → правая кнопка → Register → Server.
+3. Заполнить: Name = `Clinic`, Host = `localhost`, Port = `5432`, Username = `postgres`, Password = ваш пароль.
+4. Перейти в Databases → `clinic_db` → Schemas → Tables.
+
+**Через DBeaver (альтернатива pgAdmin):**
+
+1. Новое соединение → PostgreSQL.
+2. Host: `localhost`, Database: `clinic_db`, User: `postgres`.
+3. Готово — можно работать через визуальный редактор.
+
+### 13.5. Основные операции с данными
+
+**Добавить нового пациента:**
+
+```sql
+INSERT INTO patients (last_name, first_name, middle_name, birth_date, gender, phone, email, address)
+VALUES ('Сидоров', 'Иван', 'Петрович', '1990-06-15', 'М', '+7-900-123-45-67', 'sidorov@mail.ru', 'г. Москва, ул. Примерная, д. 1');
+```
+
+**Записать пациента на приём:**
+
+```sql
+INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, type)
+VALUES (1, 2, '2026-05-20', '11:00', 'консультация');
+-- статус автоматически станет 'запланирован'
+```
+
+**Отметить приём как проведённый:**
+
+```sql
+UPDATE appointments
+SET status = 'проведен'
+WHERE id = 9;
+```
+
+**Добавить медицинскую карту после приёма:**
+
+```sql
+INSERT INTO medical_records (patient_id, doctor_id, visit_date, diagnosis, prescription, notes)
+VALUES (1, 2, '2026-05-20', 'Хронический гастрит', 'Омепразол 20 мг утром натощак, 14 дней. Диета №1.', 'Повторный приём через 2 недели');
+```
+
+**Добавить результат анализа:**
+
+```sql
+INSERT INTO lab_tests (medical_record_id, test_name, test_date, result)
+VALUES (9, 'ФГДС', '2026-05-20', 'Гиперемия слизистой желудка, хеликобактер отрицательный');
+```
+
+**Зафиксировать оплату:**
+
+```sql
+INSERT INTO payments (patient_id, amount, type, method, status)
+VALUES (1, 1800.00, 'оплата приёма', 'карта', 'оплачено');
+```
+
+**Обновить статус платежа:**
+
+```sql
+UPDATE payments
+SET status = 'оплачено'
+WHERE id = 9;
+```
+
+### 13.6. Просмотр данных через представления
+
+Вместо сложных JOIN-запросов удобно использовать встроенные представления:
+
+```sql
+-- Всё расписание на сегодня
+SELECT * FROM v_appointments
+WHERE appointment_date = CURRENT_DATE
+ORDER BY appointment_time;
+
+-- Сводка по всем пациентам
+SELECT * FROM v_patient_summary
+ORDER BY total_appointments DESC;
+
+-- Только пациенты с задолженностью
+SELECT full_name, phone, total_paid
+FROM v_patient_summary
+WHERE total_paid = 0;
+```
+
+### 13.7. Запуск готовых запросов из файла
+
+```bash
+# Выполнить все запросы из queries.sql и вывести результат
+psql -U postgres -d clinic_db -f queries.sql
+
+# Или выполнить конкретный запрос прямо из терминала
+psql -U postgres -d clinic_db -c "SELECT * FROM v_appointments WHERE appointment_date = '2026-05-06';"
+```
+
+### 13.8. Сброс и повторное развёртывание
+
+Если нужно начать с чистого листа (например, при тестировании):
+
+```bash
+# Пересоздать всю структуру (данные будут удалены)
+psql -U postgres -d clinic_db -f schema.sql
+
+# Заново наполнить тестовыми данными
+psql -U postgres -d clinic_db -f seed.sql
+```
+
+Файл `schema.sql` в начале выполняет `DROP TABLE IF EXISTS ... CASCADE` для всех таблиц, поэтому его можно запускать повторно без ошибок.
+
+---
+
+## 14. Заключение
 
 В ходе работы была разработана и реализована реляционная база данных для медицинской клиники в СУБД PostgreSQL. База данных включает 7 таблиц, 7 ENUM-типов, 8 индексов и 2 представления.
 
