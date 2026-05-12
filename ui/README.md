@@ -24,3 +24,4 @@ python app.py
 - `_kg_seed.sql` — тестовые данные под Кыргызстан
 - `templates/`, `static/` — шаблоны и стили
 - `.env.example` — образец конфигурации
+
