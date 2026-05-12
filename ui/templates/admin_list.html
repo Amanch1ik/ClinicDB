@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ meta.title }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <a href="{{ url_for('admin_home') }}" class="back-link">{{ icon('arrow-left', 16) }}<span>К панели</span></a>
+        <h1>{{ meta.title }}</h1>
+        <p class="subtitle">Таблица <code>{{ table }}</code> · записей: {{ rows | length }}</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('admin_new', table=table) }}">{{ icon('plus') }}<span>Добавить</span></a>
+</div>
+
+{% if rows %}
+<div class="card no-pad scroll-x">
+<table class="data">
+    <thead>
+        <tr>
+            {% for c in meta.columns %}<th>{{ c }}</th>{% endfor %}
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            {% for c in meta.columns %}
+                <td>
+                    {% if c == 'password_hash' %}<span class="muted">••••••••</span>
+                    {% elif c == 'status' and row[c] %}<span class="status status-{{ row[c] }}">{{ row[c] }}</span>
+                    {% elif c == 'role' and row[c] %}<span class="chip chip-{{ 'a' if row[c] == 'администратор' else ('d' if row[c] == 'врач' else 'r') }}">{{ row[c] }}</span>
+                    {% else %}{{ row[c] | fmt }}
+                    {% endif %}
+                </td>
+            {% endfor %}
+            <td class="row-actions">
+                <a class="ic-btn" title="Изменить" href="{{ url_for('admin_edit', table=table, row_id=row.id) }}">{{ icon('edit', 16) }}</a>
+                <form method="post" action="{{ url_for('admin_delete', table=table, row_id=row.id) }}"
+                      class="inline" onsubmit="return confirm('Удалить запись id={{ row.id }}?');">
+                    <button class="ic-btn ic-btn-danger" title="Удалить" type="submit">{{ icon('trash', 16) }}</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-ic">{{ icon('file', 48) }}</div>
+    <h3>Записей нет</h3>
+    <p>Добавьте первую запись в таблицу.</p>
+    <a class="btn btn-primary" href="{{ url_for('admin_new', table=table) }}">{{ icon('plus') }}<span>Добавить</span></a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Вход{% endblock %}
+{% block body_class %}auth{% endblock %}
+
+{% block content %}
+<div class="auth-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="grid-overlay"></div>
+    <div class="ekg">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path class="ekg-line" d="M0 60 L100 60 L150 60 L180 60 L200 40 L210 60 L225 95 L240 25 L255 60 L290 60 L310 60 L325 60 L345 60 L365 45 L380 60 L395 95 L410 25 L425 60 L455 60 L490 60 L510 60 L530 40 L545 60 L560 95 L575 25 L590 60 L625 60 L660 60 L685 60 L705 45 L720 60 L735 95 L750 25 L765 60 L795 60 L830 60 L860 60 L880 40 L895 60 L910 95 L925 25 L940 60 L970 60 L1005 60 L1035 60 L1055 45 L1070 60 L1085 95 L1100 25 L1115 60 L1200 60"/>
+        </svg>
+    </div>
+</div>
+
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <div class="brand-mark big">{{ icon('cross', 28) }}</div>
+            <div>
+                <h1>ClinicDB</h1>
+                <p>информационная система клиники</p>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, msg in messages %}
+                <div class="flash flash-{{ category }}">
+                    <span class="flash-ic">{{ icon('alert', 18) }}</span>
+                    <span>{{ msg }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="post" class="auth-form">
+            <label class="field">
+                <span class="field-label">Логин</span>
+                <span class="field-input">
+                    <span class="field-ic">{{ icon('user', 18) }}</span>
+                    <input name="login" autofocus required autocomplete="username">
+                </span>
+            </label>
+
+            <label class="field">
+                <span class="field-label">Пароль</span>
+                <span class="field-input">
+                    <span class="field-ic">{{ icon('lock', 18) }}</span>
+                    <input name="password" type="password" required autocomplete="current-password">
+                </span>
+            </label>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                {{ icon('login', 18) }}
+                <span>Войти в систему</span>
+            </button>
+        </form>
+
+        <div class="auth-hint">
+            <div class="hint-title">{{ icon('info', 14) }} Тестовые учётные записи</div>
+            <table class="cred-table">
+                <tr><th>Логин</th><th>Роль</th></tr>
+                <tr><td>a.osmonov</td><td>администратор</td></tr>
+                <tr><td>ch.usupova</td><td>регистратор</td></tr>
+                <tr><td>askarov.mb</td><td>врач (терапевт)</td></tr>
+                <tr><td>turdubaeva.ns</td><td>врач (кардиолог)</td></tr>
+            </table>
+            <p class="muted">Пароли заданы в <code>init_passwords.py</code></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

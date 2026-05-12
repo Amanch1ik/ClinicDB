@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# Локальные конфиги
+.env
+.env.local
+*.log
+*.status
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

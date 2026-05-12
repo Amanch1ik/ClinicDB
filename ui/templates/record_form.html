@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Новая запись в медкарту{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <a href="{{ url_for('doctor_patient_card', patient_id=patient.id) }}" class="back-link">{{ icon('arrow-left', 16) }}<span>К карте пациента</span></a>
+        <h1>{{ icon('file', 22) }} Новая запись — {{ patient.last_name }} {{ patient.first_name }}</h1>
+    </div>
+</div>
+
+<div class="card">
+<form method="post" class="form-grid">
+    <label class="field">
+        <span class="field-label">Дата визита <em>*</em></span>
+        <input type="date" name="visit_date" value="{{ today }}" required>
+    </label>
+
+    {% if doctors %}
+    <label class="field">
+        <span class="field-label">Врач <em>*</em></span>
+        <select name="doctor_id" required>
+            {% for d in doctors %}
+                <option value="{{ d.id }}">{{ d.last_name }} {{ d.first_name }} — {{ d.specialty }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    {% endif %}
+
+    <label class="field span-2">
+        <span class="field-label">Диагноз <em>*</em></span>
+        <textarea name="diagnosis" rows="2" required></textarea>
+    </label>
+
+    <label class="field span-2">
+        <span class="field-label">Назначения</span>
+        <textarea name="prescription" rows="3"></textarea>
+    </label>
+
+    <label class="field span-2">
+        <span class="field-label">Заметки</span>
+        <textarea name="notes" rows="2"></textarea>
+    </label>
+
+    <div class="form-actions span-2">
+        <button class="btn btn-primary" type="submit">{{ icon('check') }}<span>Сохранить</span></button>
+        <a class="btn" href="{{ url_for('doctor_patient_card', patient_id=patient.id) }}">{{ icon('x') }}<span>Отмена</span></a>
+    </div>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Карта пациента{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <a href="{{ url_for('doctor_home') }}" class="back-link">{{ icon('arrow-left', 16) }}<span>К списку пациентов</span></a>
+        <h1>{{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name or '' }}</h1>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('medical_record_new', patient_id=patient.id) }}">{{ icon('plus') }}<span>Запись в карту</span></a>
+</div>
+
+<section class="card">
+    <h2>{{ icon('user') }} Контактные данные</h2>
+    <div class="info-grid">
+        <div class="info-item"><span class="info-label">Дата рождения</span><span>{{ patient.birth_date }}</span></div>
+        <div class="info-item"><span class="info-label">Пол</span><span>{{ patient.gender }}</span></div>
+        <div class="info-item"><span class="info-label">{{ icon('phone', 14) }} Телефон</span><span>{{ patient.phone or '—' }}</span></div>
+        <div class="info-item"><span class="info-label">{{ icon('mail', 14) }} Email</span><span>{{ patient.email or '—' }}</span></div>
+        <div class="info-item span-2"><span class="info-label">{{ icon('home', 14) }} Адрес</span><span>{{ patient.address or '—' }}</span></div>
+    </div>
+</section>
+
+<section class="card">
+    <h2>{{ icon('file') }} История приёмов</h2>
+    {% if records %}
+        {% for r in records %}
+        <article class="record">
+            <header class="record-head">
+                <div>
+                    <span class="record-date">{{ icon('calendar', 14) }}{{ r.visit_date }}</span>
+                    <span class="record-doctor">{{ r.doctor_name }}</span>
+                </div>
+                <a class="btn btn-sm" href="{{ url_for('lab_test_new', record_id=r.id) }}">{{ icon('plus') }}<span>Анализ</span></a>
+            </header>
+            <div class="record-body">
+                <p><span class="rk">Диагноз:</span> {{ r.diagnosis }}</p>
+                {% if r.prescription %}<p><span class="rk">Назначения:</span> {{ r.prescription }}</p>{% endif %}
+                {% if r.notes %}<p class="muted"><span class="rk">Заметки:</span> {{ r.notes }}</p>{% endif %}
+            </div>
+
+            {% if labs.get(r.id) %}
+            <table class="data inner">
+                <thead>
+                    <tr><th>Анализ</th><th>Дата</th><th>Результат</th><th>Заметки</th></tr>
+                </thead>
+                <tbody>
+                    {% for lt in labs[r.id] %}
+                    <tr>
+                        <td>{{ icon('flask', 14) }} {{ lt.test_name }}</td>
+                        <td>{{ lt.test_date }}</td>
+                        <td>{{ lt.result or '—' }}</td>
+                        <td class="muted">{{ lt.notes or '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </article>
+        {% endfor %}
+    {% else %}
+    <p class="empty">Записей в медкарте пока нет.</p>
+    {% endif %}
+</section>
+{% endblock %}

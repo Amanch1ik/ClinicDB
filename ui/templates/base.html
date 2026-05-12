@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Клиника{% endblock %} — ClinicDB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{% block body_class %}app{% endblock %}">
+{% from "_icons.html" import icon %}
+
+{% if current_user %}
+<aside class="sidebar">
+    <div class="brand">
+        <span class="brand-mark">{{ icon('cross', 22) }}</span>
+        <div>
+            <div class="brand-title">ClinicDB</div>
+            <div class="brand-sub">медицинская система</div>
+        </div>
+    </div>
+
+    <nav class="side-nav">
+        {% if current_user.role == 'администратор' %}
+            <a href="{{ url_for('admin_home') }}" class="nav-item">{{ icon('dashboard') }}<span>Панель</span></a>
+            <div class="nav-section">Каталоги</div>
+            <a href="{{ url_for('admin_list', table='patients') }}" class="nav-item">{{ icon('user') }}<span>Пациенты</span></a>
+            <a href="{{ url_for('admin_list', table='doctors') }}" class="nav-item">{{ icon('stethoscope') }}<span>Врачи</span></a>
+            <a href="{{ url_for('admin_list', table='users') }}" class="nav-item">{{ icon('users') }}<span>Пользователи</span></a>
+            <div class="nav-section">Работа клиники</div>
+            <a href="{{ url_for('registrar_home') }}" class="nav-item">{{ icon('calendar') }}<span>Расписание</span></a>
+            <a href="{{ url_for('admin_list', table='medical_records') }}" class="nav-item">{{ icon('file') }}<span>Медкарты</span></a>
+            <a href="{{ url_for('admin_list', table='lab_tests') }}" class="nav-item">{{ icon('flask') }}<span>Анализы</span></a>
+            <a href="{{ url_for('admin_list', table='payments') }}" class="nav-item">{{ icon('card') }}<span>Платежи</span></a>
+        {% elif current_user.role == 'врач' %}
+            <a href="{{ url_for('doctor_home') }}" class="nav-item">{{ icon('dashboard') }}<span>Мой кабинет</span></a>
+        {% elif current_user.role == 'регистратор' %}
+            <a href="{{ url_for('registrar_home') }}" class="nav-item">{{ icon('calendar') }}<span>Расписание</span></a>
+            <a href="{{ url_for('appointment_new') }}" class="nav-item">{{ icon('plus') }}<span>Записать</span></a>
+        {% endif %}
+    </nav>
+
+    <div class="side-foot">
+        <div class="user-mini">
+            <div class="avatar">{{ current_user.login[0] | upper }}</div>
+            <div>
+                <div class="user-login">{{ current_user.login }}</div>
+                <div class="user-role">{{ current_user.role }}</div>
+            </div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout">{{ icon('logout', 16) }}<span>Выйти</span></a>
+    </div>
+</aside>
+{% endif %}
+
+<main class="content {% if not current_user %}content-full{% endif %}">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-stack">
+            {% for category, msg in messages %}
+                <div class="flash flash-{{ category }}">
+                    <span class="flash-ic">{{ icon('check-circle' if category == 'ok' else 'alert', 18) }}</span>
+                    <span>{{ msg }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="page-enter">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+</body>
+</html>

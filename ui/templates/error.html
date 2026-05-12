@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Ошибка {{ code }}{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-ic">{{ icon('alert', 56) }}</div>
+    <h1>{{ code }}</h1>
+    <p>{{ message }}</p>
+    <a class="btn btn-primary" href="{{ url_for('index') }}">{{ icon('home') }}<span>На главную</span></a>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Расписание{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>{{ icon('calendar', 22) }} Расписание</h1>
+        <p class="subtitle">Приёмы на {{ on_date }}</p>
+    </div>
+    <div class="actions">
+        <form method="get" class="inline">
+            <input type="date" name="date" value="{{ on_date }}">
+            <button class="btn">{{ icon('search') }}<span>Показать</span></button>
+        </form>
+        <a class="btn btn-primary" href="{{ url_for('appointment_new') }}">{{ icon('plus') }}<span>Записать на приём</span></a>
+    </div>
+</div>
+
+{% if schedule %}
+<div class="card no-pad">
+<table class="data">
+    <thead>
+        <tr>
+            <th>Время</th>
+            <th>Пациент</th>
+            <th>Врач</th>
+            <th>Специальность</th>
+            <th>Тип</th>
+            <th>Статус</th>
+            <th>Заметки</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for a in schedule %}
+        <tr>
+            <td><span class="time-cell">{{ icon('clock', 14) }}{{ a.appointment_time }}</span></td>
+            <td><strong>{{ a.patient_name }}</strong></td>
+            <td>{{ a.doctor_name }}</td>
+            <td><span class="chip">{{ a.specialty }}</span></td>
+            <td>{{ a.type }}</td>
+            <td><span class="status status-{{ a.status }}">{{ a.status }}</span></td>
+            <td class="muted">{{ a.notes or '—' }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-ic">{{ icon('calendar', 48) }}</div>
+    <h3>На эту дату приёмов нет</h3>
+    <p>Выберите другую дату или создайте новую запись.</p>
+    <a class="btn btn-primary" href="{{ url_for('appointment_new') }}">{{ icon('plus') }}<span>Записать на приём</span></a>
+</div>
+{% endif %}
+{% endblock %}

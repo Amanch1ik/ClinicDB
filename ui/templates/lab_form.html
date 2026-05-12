@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Новый анализ{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <a href="{{ url_for('doctor_patient_card', patient_id=record.patient_id) }}" class="back-link">{{ icon('arrow-left', 16) }}<span>К карте пациента</span></a>
+        <h1>{{ icon('flask', 22) }} Новый анализ к медкарте №{{ record.id }}</h1>
+    </div>
+</div>
+
+<div class="card">
+<form method="post" class="form-grid">
+    <label class="field span-2">
+        <span class="field-label">Название анализа <em>*</em></span>
+        <input name="test_name" required>
+    </label>
+
+    <label class="field">
+        <span class="field-label">Дата <em>*</em></span>
+        <input type="date" name="test_date" value="{{ today }}" required>
+    </label>
+
+    <label class="field span-2">
+        <span class="field-label">Результат</span>
+        <textarea name="result" rows="3"></textarea>
+    </label>
+
+    <label class="field span-2">
+        <span class="field-label">Заметки</span>
+        <textarea name="notes" rows="2"></textarea>
+    </label>
+
+    <div class="form-actions span-2">
+        <button class="btn btn-primary" type="submit">{{ icon('check') }}<span>Сохранить</span></button>
+        <a class="btn" href="{{ url_for('doctor_patient_card', patient_id=record.patient_id) }}">{{ icon('x') }}<span>Отмена</span></a>
+    </div>
+</form>
+</div>
+{% endblock %}

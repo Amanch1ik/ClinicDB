@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Панель администратора{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Панель администратора</h1>
+        <p class="subtitle">Состояние клиники и быстрый доступ к каталогам</p>
+    </div>
+</div>
+
+<section class="stats stagger">
+    <div class="stat-card grad-1">
+        <div class="stat-ic">{{ icon('user', 22) }}</div>
+        <div class="stat-num">{{ stats.patients }}</div>
+        <div class="stat-lbl">Пациентов</div>
+    </div>
+    <div class="stat-card grad-2">
+        <div class="stat-ic">{{ icon('stethoscope', 22) }}</div>
+        <div class="stat-num">{{ stats.doctors }}</div>
+        <div class="stat-lbl">Врачей</div>
+    </div>
+    <div class="stat-card grad-3">
+        <div class="stat-ic">{{ icon('users', 22) }}</div>
+        <div class="stat-num">{{ stats.users }}</div>
+        <div class="stat-lbl">Пользователей</div>
+    </div>
+    <div class="stat-card grad-4">
+        <div class="stat-ic">{{ icon('calendar', 22) }}</div>
+        <div class="stat-num">{{ stats.appointments }}</div>
+        <div class="stat-lbl">Приёмов</div>
+    </div>
+    <div class="stat-card grad-5">
+        <div class="stat-ic">{{ icon('file', 22) }}</div>
+        <div class="stat-num">{{ stats.records }}</div>
+        <div class="stat-lbl">Медкарт</div>
+    </div>
+    <div class="stat-card grad-6">
+        <div class="stat-ic">{{ icon('flask', 22) }}</div>
+        <div class="stat-num">{{ stats.labs }}</div>
+        <div class="stat-lbl">Анализов</div>
+    </div>
+    <div class="stat-card grad-7">
+        <div class="stat-ic">{{ icon('card', 22) }}</div>
+        <div class="stat-num">{{ stats.payments }}</div>
+        <div class="stat-lbl">Платежей</div>
+    </div>
+</section>
+
+<section class="card">
+    <h2>{{ icon('dashboard') }} Каталоги данных</h2>
+    <div class="catalog-grid stagger">
+        {% for name, meta in tables.items() %}
+            <a class="catalog-tile" href="{{ url_for('admin_list', table=name) }}">
+                <div class="catalog-ic">
+                    {% if name == 'patients' %}{{ icon('user') }}
+                    {% elif name == 'doctors' %}{{ icon('stethoscope') }}
+                    {% elif name == 'users' %}{{ icon('users') }}
+                    {% elif name == 'appointments' %}{{ icon('calendar') }}
+                    {% elif name == 'medical_records' %}{{ icon('file') }}
+                    {% elif name == 'lab_tests' %}{{ icon('flask') }}
+                    {% elif name == 'payments' %}{{ icon('card') }}
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="catalog-title">{{ meta.title }}</div>
+                    <div class="catalog-sub">{{ name }}</div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

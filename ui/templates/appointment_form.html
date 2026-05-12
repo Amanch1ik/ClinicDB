@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Новая запись{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <a href="{{ url_for('registrar_home') }}" class="back-link">{{ icon('arrow-left', 16) }}<span>К расписанию</span></a>
+        <h1>{{ icon('plus', 22) }} Запись на приём</h1>
+    </div>
+</div>
+
+<div class="card">
+<form method="post" class="form-grid">
+    <label class="field">
+        <span class="field-label">Пациент <em>*</em></span>
+        <select name="patient_id" required>
+            <option value="">— выберите пациента —</option>
+            {% for p in patients %}
+                <option value="{{ p.id }}">{{ p.last_name }} {{ p.first_name }} (id {{ p.id }})</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label class="field">
+        <span class="field-label">Врач <em>*</em></span>
+        <select name="doctor_id" required>
+            <option value="">— выберите врача —</option>
+            {% for d in doctors %}
+                <option value="{{ d.id }}">{{ d.last_name }} {{ d.first_name }} — {{ d.specialty }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label class="field">
+        <span class="field-label">Дата <em>*</em></span>
+        <input type="date" name="appointment_date" required>
+    </label>
+
+    <label class="field">
+        <span class="field-label">Время <em>*</em></span>
+        <input type="time" name="appointment_time" required>
+    </label>
+
+    <label class="field">
+        <span class="field-label">Тип приёма</span>
+        <select name="type">
+            <option value="консультация">консультация</option>
+            <option value="анализ">анализ</option>
+            <option value="процедура">процедура</option>
+        </select>
+    </label>
+
+    <label class="field">
+        <span class="field-label">Статус</span>
+        <select name="status">
+            <option value="запланирован">запланирован</option>
+            <option value="проведен">проведен</option>
+            <option value="отменен">отменен</option>
+        </select>
+    </label>
+
+    <label class="field span-2">
+        <span class="field-label">Заметки</span>
+        <textarea name="notes" rows="3"></textarea>
+    </label>
+
+    <div class="form-actions span-2">
+        <button type="submit" class="btn btn-primary">{{ icon('check') }}<span>Сохранить</span></button>
+        <a href="{{ url_for('registrar_home') }}" class="btn">{{ icon('x') }}<span>Отмена</span></a>
+    </div>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Кабинет врача{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>{{ icon('stethoscope', 22) }} Мой кабинет</h1>
+        <p class="subtitle">Сегодняшние приёмы и список ваших пациентов</p>
+    </div>
+</div>
+
+<section class="card">
+    <h2>{{ icon('calendar') }} Сегодняшние приёмы</h2>
+    {% if schedule %}
+    <table class="data">
+        <thead>
+            <tr>
+                <th>Время</th><th>Пациент</th><th>Тип</th><th>Статус</th><th>Заметки</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in schedule %}
+            <tr>
+                <td><span class="time-cell">{{ icon('clock', 14) }}{{ a.appointment_time }}</span></td>
+                <td><strong>{{ a.patient_name }}</strong></td>
+                <td>{{ a.type }}</td>
+                <td><span class="status status-{{ a.status }}">{{ a.status }}</span></td>
+                <td class="muted">{{ a.notes or '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Сегодня приёмов нет.</p>
+    {% endif %}
+</section>
+
+<section class="card">
+    <h2>{{ icon('users') }} Мои пациенты</h2>
+    {% if patients %}
+    <div class="patient-grid stagger">
+        {% for p in patients %}
+        <a class="patient-tile" href="{{ url_for('doctor_patient_card', patient_id=p.id) }}">
+            <div class="patient-avatar">{{ p.last_name[0] | upper }}</div>
+            <div class="patient-meta">
+                <div class="patient-name">{{ p.last_name }} {{ p.first_name }}</div>
+                <div class="patient-sub">{{ p.middle_name or '' }}</div>
+                {% if p.phone %}<div class="patient-phone">{{ icon('phone', 12) }} {{ p.phone }}</div>{% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty">Ещё нет пациентов.</p>
+    {% endif %}
+</section>
+{% endblock %}

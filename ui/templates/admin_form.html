@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ meta.title }} — {% if row %}изменение{% else %}добавление{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <a href="{{ url_for('admin_list', table=table) }}" class="back-link">{{ icon('arrow-left', 16) }}<span>К списку</span></a>
+        <h1>
+            {{ meta.title }}:
+            {% if row %}изменение #{{ row.id }}{% else %}новая запись{% endif %}
+        </h1>
+    </div>
+</div>
+
+<div class="card">
+<form method="post" class="form-grid">
+    {% for name, label, ftype, required in meta.form_fields %}
+        <label class="field {{ 'span-2' if ftype == 'textarea' else '' }}">
+            <span class="field-label">{{ label }}{% if required %} <em>*</em>{% endif %}</span>
+            {% set value = row[name] if row and name in row else '' %}
+            {% if ftype.startswith('select:') %}
+                <select name="{{ name }}" {% if required %}required{% endif %}>
+                    {% if not required %}<option value="">—</option>{% endif %}
+                    {% for opt in ftype.split(':',1)[1].split(',') %}
+                        <option value="{{ opt }}" {% if value|string == opt %}selected{% endif %}>{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            {% elif ftype == 'textarea' %}
+                <textarea name="{{ name }}" rows="3" {% if required %}required{% endif %}>{{ value or '' }}</textarea>
+            {% elif ftype == 'password' %}
+                <input type="password" name="{{ name }}" {% if not row and required %}required{% endif %}
+                       placeholder="{% if row %}оставьте пустым, если не меняете{% endif %}">
+            {% else %}
+                <input type="{{ ftype }}" name="{{ name }}" value="{{ value if value is not none else '' }}"
+                       {% if required and not row %}required{% endif %}>
+            {% endif %}
+        </label>
+    {% endfor %}
+
+    <div class="form-actions span-2">
+        <button class="btn btn-primary" type="submit">{{ icon('check') }}<span>Сохранить</span></button>
+        <a class="btn" href="{{ url_for('admin_list', table=table) }}">{{ icon('x') }}<span>Отмена</span></a>
+    </div>
+</form>
+</div>
+{% endblock %}
